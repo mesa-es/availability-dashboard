@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Availability Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --surface2: #F0EDE6;
+    --border: #E2DDD4;
+    --border2: #CDC8BE;
+    --text: #1A1916;
+    --text2: #6B6760;
+    --text3: #9E9A93;
+    --green: #1D6B4A;
+    --green-bg: #E8F5EE;
+    --green-border: #A8D5BB;
+    --red: #B83232;
+    --red-bg: #FDEAEA;
+    --red-border: #F0B3B3;
+    --amber: #8A5E00;
+    --amber-bg: #FFF8E6;
+    --amber-border: #F0D080;
+    --blue: #1A4A8A;
+    --blue-bg: #EAF1FB;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .container { max-width: 700px; margin: 0 auto; }
+
+  header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  header p { font-size: 13px; color: var(--text3); margin-top: 3px; }
+
+  .sync-badge {
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--surface2);
+    color: var(--text3);
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .sync-badge.pending { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
+  .sync-badge.synced { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .card-label {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text3);
+    margin-bottom: 0.75rem;
+  }
+
+  .rest-selector { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .rest-btn {
+    padding: 7px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text2);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.12s;
+    font-weight: 400;
+  }
+  .rest-btn:hover { border-color: var(--border2); color: var(--text); }
+  .rest-btn.active {
+    background: var(--text);
+    color: #fff;
+    border-color: var(--text);
+    font-weight: 500;
+  }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  label.field-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text3);
+    margin-bottom: 6px;
+  }
+
+  input[type=date], input[type=text], input[type=number], select {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.12s;
+  }
+  input:focus, select:focus { border-color: var(--border2); }
+
+  .legend {
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    display: inline-block; margin-right: 5px; vertical-align: middle;
+  }
+  .dot-idle { background: var(--border2); }
+  .dot-open { background: var(--green); }
+  .dot-full { background: var(--red); }
+
+  .time-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 8px;
+  }
+
+  .slot {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 10px 8px;
+    cursor: pointer;
+    transition: all 0.12s;
+    background: var(--surface2);
+  }
+  .slot:hover { border-color: var(--border2); background: var(--surface); }
+  .slot.open { background: var(--green-bg); border-color: var(--green-border); }
+  .slot.full { background: var(--red-bg); border-color: var(--red-border); }
+  .slot.selected { outline: 2px solid var(--text); outline-offset: 2px; }
+
+  .slot-time { font-size: 13px; font-weight: 500; color: var(--text); display: block; }
+  .slot.open .slot-time { color: var(--green); }
+  .slot.full .slot-time { color: var(--red); }
+  .slot-info { font-size: 11px; color: var(--text3); margin-top: 2px; display: block; font-family: 'DM Mono', monospace; }
+  .slot.open .slot-info { color: var(--green); }
+  .slot.full .slot-info { color: var(--red); }
+
+  .editor {
+    display: none;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+  .editor.visible { display: block; }
+  .editor-title {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    color: var(--text);
+  }
+
+  .editor-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 4px; }
+
+  button.btn-save {
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--text);
+    color: #fff;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.12s;
+  }
+  button.btn-save:hover { opacity: 0.85; }
+
+  button.btn-cancel {
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+  }
+
+  .sheet-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .sheet-row input { flex: 1; min-width: 200px; }
+
+  button.btn-push {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.12s;
+  }
+  button.btn-push:hover { background: var(--text); color: #fff; border-color: var(--text); }
+  button.btn-push:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .hint {
+    font-size: 12px;
+    color: var(--text3);
+    margin-top: 4px;
+  }
+
+  .log {
+    margin-top: 0.75rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text3);
+    max-height: 110px;
+    overflow-y: auto;
+  }
+  .log-line { padding: 2px 0; }
+  .log-line.ok { color: var(--green); }
+  .log-line.err { color: var(--red); }
+  .log-line.info { color: var(--blue); }
+
+  .divider { height: 1px; background: var(--border); margin: 0.75rem 0; }
+
+  @media (max-width: 500px) {
+    .row2, .editor-row { grid-template-columns: 1fr; }
+    .sheet-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div>
+      <h1>Availability dashboard</h1>
+      <p>Update open seats after a no-show or cancellation</p>
+    </div>
+    <span class="sync-badge" id="sync-badge">not synced</span>
+  </header>
+
+  <!-- Restaurant + Date -->
+  <div class="card">
+    <div class="card-label">Restaurant</div>
+    <div class="rest-selector" id="rest-selector">
+      <button class="rest-btn active" onclick="selectRest(this,'La Parrilla')">La Parrilla</button>
+      <button class="rest-btn" onclick="selectRest(this,'Bistró Norte')">Bistró Norte</button>
+      <button class="rest-btn" onclick="selectRest(this,'El Patio Verde')">El Patio Verde</button>
+    </div>
+    <div class="divider"></div>
+    <div class="row2">
+      <div>
+        <label class="field-label">Date</label>
+        <input type="date" id="date-picker" />
+      </div>
+      <div style="display:flex;align-items:flex-end;">
+        <p style="font-size:13px;color:var(--text3);padding-bottom:9px;">Tap a slot below to set availability</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Time slots -->
+  <div class="card">
+    <div class="card-label">Time slots</div>
+    <div class="legend">
+      <span><span class="dot dot-idle"></span>Not set</span>
+      <span><span class="dot dot-open"></span>Open</span>
+      <span><span class="dot dot-full"></span>Full</span>
+    </div>
+    <div class="time-grid" id="time-grid"></div>
+    <div class="editor" id="editor">
+      <div class="editor-title" id="editor-title">Editing 20:00</div>
+      <div class="editor-row">
+        <div>
+          <label class="field-label">Seats available</label>
+          <input type="number" id="seats-input" min="0" max="99" value="4" />
+        </div>
+        <div>
+          <label class="field-label">Status</label>
+          <select id="status-select">
+            <option value="open">Open</option>
+            <option value="full">Full — no availability</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-save" onclick="saveSlot()">Save slot</button>
+        <button class="btn-cancel" onclick="closeEditor()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sync to Google Sheet -->
+  <div class="card">
+    <div class="card-label">Sync to Google Sheets</div>
+    <div style="margin-bottom:10px;">
+      <label class="field-label">Apps Script URL</label>
+      <div class="sheet-row">
+        <input type="text" id="script-url" placeholder="https://script.google.com/macros/s/.../exec" />
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label class="field-label">Google Sheet ID</label>
+      <div class="sheet-row">
+        <input type="text" id="script-url" placeholder="Paste Sheet ID from your sheet's URL" />
+        <button class="btn-push" onclick="pushToSheet()" id="push-btn">Push update →</button>
+      </div>
+      <div style="margin-top:10px;"><label class="field-label">Google Sheet ID</label><input type="text" id="sheet-id-real" placeholder="Sheet ID from docs.google.com/spreadsheets/d/THIS_ID/edit" /></div>
+      <p class="hint">Paste the full deployment URL from Apps Script → Deploy → Manage deployments</p>
+    </div>
+    <div class="log" id="log"><div class="log-line">— waiting for sync —</div></div>
+  </div>
+
+</div>
+
+<script>
+const SLOTS = ['12:00','12:30','13:00','13:30','14:00','19:00','19:30','20:00','20:30','21:00','21:30','22:00'];
+let currentRest = 'La Parrilla';
+let selectedSlot = null;
+const state = {};
+
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('date-picker').value = today;
+document.getElementById('date-picker').addEventListener('change', () => { closeEditor(); renderGrid(); });
+
+function key(r, d, s) { return `${r}|${d}|${s}`; }
+
+function renderGrid() {
+  const date = document.getElementById('date-picker').value;
+  const grid = document.getElementById('time-grid');
+  grid.innerHTML = '';
+  SLOTS.forEach(slot => {
+    const k = key(currentRest, date, slot);
+    const d = state[k] || {};
+    const el = document.createElement('div');
+    el.className = 'slot' + (d.status === 'open' ? ' open' : d.status === 'full' ? ' full' : '') + (selectedSlot === slot ? ' selected' : '');
+    el.innerHTML = `<span class="slot-time">${slot}</span><span class="slot-info">${d.status === 'open' ? d.seats + ' seats' : d.status === 'full' ? 'full' : 'tap to set'}</span>`;
+    el.onclick = () => openEditor(slot, el);
+    grid.appendChild(el);
+  });
+}
+
+function openEditor(slot, el) {
+  selectedSlot = slot;
+  const date = document.getElementById('date-picker').value;
+  const k = key(currentRest, date, slot);
+  const d = state[k] || { seats: 4, status: 'open' };
+  document.getElementById('editor-title').textContent = `Editing ${slot} — ${currentRest}`;
+  document.getElementById('seats-input').value = d.seats || 4;
+  document.getElementById('status-select').value = d.status || 'open';
+  document.getElementById('editor').classList.add('visible');
+  renderGrid();
+}
+
+function closeEditor() {
+  document.getElementById('editor').classList.remove('visible');
+  selectedSlot = null;
+  renderGrid();
+}
+
+function saveSlot() {
+  if (!selectedSlot) return;
+  const date = document.getElementById('date-picker').value;
+  const k = key(currentRest, date, selectedSlot);
+  state[k] = {
+    restaurant: currentRest,
+    date,
+    slot: selectedSlot,
+    seats: parseInt(document.getElementById('seats-input').value) || 0,
+    status: document.getElementById('status-select').value,
+    updatedAt: new Date().toISOString()
+  };
+  closeEditor();
+  setBadge('pending');
+  addLog(`Saved: ${currentRest} · ${date} · ${selectedSlot}`, 'ok');
+}
+
+function selectRest(btn, name) {
+  document.querySelectorAll('.rest-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentRest = name;
+  closeEditor();
+  renderGrid();
+}
+
+function setBadge(state) {
+  const b = document.getElementById('sync-badge');
+  b.className = 'sync-badge';
+  if (state === 'pending') { b.textContent = 'unsaved changes'; b.classList.add('pending'); }
+  else if (state === 'synced') { b.textContent = 'synced ✓'; b.classList.add('synced'); }
+  else { b.textContent = 'not synced'; }
+}
+
+function addLog(msg, cls) {
+  const log = document.getElementById('log');
+  const t = new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const line = document.createElement('div');
+  line.className = 'log-line' + (cls ? ' ' + cls : '');
+  line.textContent = `[${t}] ${msg}`;
+  log.insertBefore(line, log.firstChild);
+}
+
+async function pushToSheet() {
+  const scriptUrl = document.getElementById('script-url').value.trim();
+  const sheetId = document.getElementById('script-url').value.trim();
+  if (!scriptUrl) { addLog('Paste your Apps Script URL first', 'err'); return; }
+  if (!sheetId) { addLog('Paste your Google Sheet ID first', 'err'); return; }
+  const rows = Object.values(state);
+  if (rows.length === 0) { addLog('No slots saved yet — set some slots first', 'err'); return; }
+
+  const btn = document.getElementById('push-btn');
+  btn.disabled = true;
+  btn.textContent = 'Pushing…';
+  addLog(`Pushing ${rows.length} row(s)…`, 'info');
+
+  try {
+    const res = await fetch(scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sheetId, rows })
+    });
+    if (res.ok) {
+      addLog(`Synced ${rows.length} row(s) successfully`, 'ok');
+      setBadge('synced');
+    } else {
+      addLog(`Sheet returned error ${res.status}`, 'err');
+    }
+  } catch(e) {
+    addLog('Could not reach Apps Script — check CORS or URL', 'err');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Push update →';
+}
+
+renderGrid();
+</script>
+</body>
+</html>
