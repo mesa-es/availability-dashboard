@@ -3,290 +3,114 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Availability Dashboard</title>
+<title>Mesa · Availability</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg: #F7F5F0;
-    --surface: #FFFFFF;
-    --surface2: #F0EDE6;
-    --border: #E2DDD4;
-    --border2: #CDC8BE;
-    --text: #1A1916;
-    --text2: #6B6760;
-    --text3: #9E9A93;
-    --green: #1D6B4A;
-    --green-bg: #E8F5EE;
-    --green-border: #A8D5BB;
-    --red: #B83232;
-    --red-bg: #FDEAEA;
-    --red-border: #F0B3B3;
-    --amber: #8A5E00;
-    --amber-bg: #FFF8E6;
-    --amber-border: #F0D080;
-    --blue: #1A4A8A;
-    --blue-bg: #EAF1FB;
-    --radius: 10px;
-    --radius-sm: 6px;
+    --bg: #F7F5F0; --surface: #FFFFFF; --surface2: #F0EDE6; --border: #E2DDD4;
+    --border2: #CDC8BE; --text: #1A1916; --text2: #6B6760; --text3: #9E9A93;
+    --green: #1D6B4A; --green-bg: #E8F5EE; --green-border: #A8D5BB;
+    --red: #B83232; --red-bg: #FDEAEA; --red-border: #F0B3B3;
+    --amber: #8A5E00; --amber-bg: #FFF8E6; --amber-border: #F0D080;
+    --blue: #1A4A8A; --blue-bg: #EAF1FB; --blue-border: #A8C4F0;
+    --purple: #5A2D8A; --purple-bg: #F3EDFB; --purple-border: #C8A8F0;
+    --radius: 10px; --radius-sm: 6px;
   }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 2rem 1rem;
-  }
-
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem 1rem; }
   .container { max-width: 700px; margin: 0 auto; }
-
-  header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-    padding-bottom: 1.25rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  header h1 {
-    font-size: 22px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    color: var(--text);
-  }
-
+  header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+  header h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
   header p { font-size: 13px; color: var(--text3); margin-top: 3px; }
-
-  .sync-badge {
-    font-size: 12px;
-    font-family: 'DM Mono', monospace;
-    padding: 4px 10px;
-    border-radius: 20px;
-    background: var(--surface2);
-    color: var(--text3);
-    border: 1px solid var(--border);
-    white-space: nowrap;
-  }
+  .sync-badge { font-size: 12px; font-family: 'DM Mono', monospace; padding: 4px 10px; border-radius: 20px; background: var(--surface2); color: var(--text3); border: 1px solid var(--border); white-space: nowrap; }
   .sync-badge.pending { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
   .sync-badge.synced { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.25rem;
-    margin-bottom: 1rem;
-  }
-
-  .card-label {
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text3);
-    margin-bottom: 0.75rem;
-  }
-
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; }
+  .card-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 0.75rem; }
   .rest-selector { display: flex; gap: 8px; flex-wrap: wrap; }
-
-  .rest-btn {
-    padding: 7px 16px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    color: var(--text2);
-    font-size: 14px;
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-    transition: all 0.12s;
-    font-weight: 400;
-  }
+  .rest-btn { padding: 7px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface2); color: var(--text2); font-size: 14px; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.12s; }
   .rest-btn:hover { border-color: var(--border2); color: var(--text); }
-  .rest-btn.active {
-    background: var(--text);
-    color: #fff;
-    border-color: var(--text);
-    font-weight: 500;
-  }
-
+  .rest-btn.active { background: var(--text); color: #fff; border-color: var(--text); font-weight: 500; }
   .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-
-  label.field-label {
-    display: block;
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text3);
-    margin-bottom: 6px;
-  }
-
-  input[type=date], input[type=text], input[type=number], select {
-    width: 100%;
-    padding: 8px 12px;
-    font-size: 14px;
-    font-family: 'DM Sans', sans-serif;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: var(--surface);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.12s;
-  }
+  label.field-label { display: block; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 6px; }
+  input[type=date], input[type=number], select { width: 100%; padding: 8px 12px; font-size: 14px; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); outline: none; transition: border-color 0.12s; }
   input:focus, select:focus { border-color: var(--border2); }
-
-  .legend {
-    display: flex;
-    gap: 16px;
-    font-size: 12px;
-    color: var(--text3);
-    margin-bottom: 0.75rem;
-    flex-wrap: wrap;
-  }
-  .dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    display: inline-block; margin-right: 5px; vertical-align: middle;
-  }
+  .legend { display: flex; gap: 16px; font-size: 12px; color: var(--text3); margin-bottom: 0.75rem; flex-wrap: wrap; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: middle; }
   .dot-idle { background: var(--border2); }
   .dot-open { background: var(--green); }
-  .dot-full { background: var(--red); }
-
-  .time-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-    gap: 8px;
-  }
-
-  .slot {
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 10px 10px 8px;
-    cursor: pointer;
-    transition: all 0.12s;
-    background: var(--surface2);
-  }
+  .dot-filled-mesa { background: var(--blue); }
+  .dot-filled-walkin { background: var(--purple); }
+  .dot-filled-covermanager { background: var(--amber); }
+  .time-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+  .slot { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 10px 8px; cursor: pointer; transition: all 0.12s; background: var(--surface2); }
   .slot:hover { border-color: var(--border2); background: var(--surface); }
   .slot.open { background: var(--green-bg); border-color: var(--green-border); }
-  .slot.full { background: var(--red-bg); border-color: var(--red-border); }
+  .slot.filled-mesa { background: var(--blue-bg); border-color: var(--blue-border); cursor: default; }
+  .slot.filled-walkin { background: var(--purple-bg); border-color: var(--purple-border); cursor: default; }
+  .slot.filled-covermanager { background: var(--amber-bg); border-color: var(--amber-border); cursor: default; }
   .slot.selected { outline: 2px solid var(--text); outline-offset: 2px; }
-
   .slot-time { font-size: 13px; font-weight: 500; color: var(--text); display: block; }
   .slot.open .slot-time { color: var(--green); }
-  .slot.full .slot-time { color: var(--red); }
+  .slot.filled-mesa .slot-time { color: var(--blue); }
+  .slot.filled-walkin .slot-time { color: var(--purple); }
+  .slot.filled-covermanager .slot-time { color: var(--amber); }
   .slot-info { font-size: 11px; color: var(--text3); margin-top: 2px; display: block; font-family: 'DM Mono', monospace; }
   .slot.open .slot-info { color: var(--green); }
-  .slot.full .slot-info { color: var(--red); }
+  .slot.filled-mesa .slot-info { color: var(--blue); }
+  .slot.filled-walkin .slot-info { color: var(--purple); }
+  .slot.filled-covermanager .slot-info { color: var(--amber); }
 
-  .editor {
-    display: none;
-    margin-top: 1rem;
-    padding: 1rem;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-  }
+  /* Editor */
+  .editor { display: none; margin-top: 1rem; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); }
   .editor.visible { display: block; }
-  .editor-title {
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 0.75rem;
-    color: var(--text);
-  }
-
+  .editor-title { font-size: 14px; font-weight: 500; margin-bottom: 0.75rem; color: var(--text); }
   .editor-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .btn-row { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+  button.btn-save { padding: 8px 18px; border-radius: var(--radius-sm); border: none; background: var(--text); color: #fff; font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; }
+  button.btn-cancel { padding: 8px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: transparent; color: var(--text2); font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; }
 
-  .btn-row { display: flex; gap: 8px; margin-top: 4px; }
+  /* Fill modal */
+  .fill-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
+  .fill-modal.visible { display: flex; }
+  .fill-modal-box { background: var(--surface); border-radius: var(--radius); padding: 1.5rem; width: 320px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+  .fill-modal-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .fill-modal-sub { font-size: 12px; color: var(--text3); margin-bottom: 1rem; }
+  .fill-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .fill-opt { padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface2); cursor: pointer; font-size: 13px; font-family: 'DM Sans', sans-serif; text-align: left; transition: all 0.12s; display: flex; align-items: center; gap: 10px; }
+  .fill-opt:hover { border-color: var(--border2); background: var(--surface); }
+  .fill-opt .fill-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .fill-opt .fill-label { font-weight: 500; color: var(--text); }
+  .fill-opt .fill-desc { font-size: 11px; color: var(--text3); margin-top: 1px; }
+  button.btn-fill-cancel { width: 100%; padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: transparent; color: var(--text2); font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; }
 
-  button.btn-save {
-    padding: 8px 18px;
-    border-radius: var(--radius-sm);
-    border: none;
-    background: var(--text);
-    color: #fff;
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    cursor: pointer;
-    transition: opacity 0.12s;
-  }
-  button.btn-save:hover { opacity: 0.85; }
-
-  button.btn-cancel {
-    padding: 8px 18px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text2);
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-  }
-
-  .sheet-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
-  .sheet-row input { flex: 1; min-width: 200px; }
-
-  button.btn-push {
-    padding: 8px 16px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border2);
-    background: var(--surface);
-    color: var(--text);
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.12s;
-  }
+  /* Push button */
+  .push-wrap { display: flex; gap: 8px; align-items: center; }
+  button.btn-push { flex: 1; padding: 10px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: var(--surface); color: var(--text); font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; transition: all 0.12s; }
   button.btn-push:hover { background: var(--text); color: #fff; border-color: var(--text); }
   button.btn-push:disabled { opacity: 0.5; cursor: not-allowed; }
+  .poll-indicator { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
 
-  .hint {
-    font-size: 12px;
-    color: var(--text3);
-    margin-top: 4px;
-  }
-
-  .log {
-    margin-top: 0.75rem;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 0.75rem 1rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--text3);
-    max-height: 110px;
-    overflow-y: auto;
-  }
+  .log { margin-top: 0.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.75rem 1rem; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text3); max-height: 110px; overflow-y: auto; }
   .log-line { padding: 2px 0; }
   .log-line.ok { color: var(--green); }
   .log-line.err { color: var(--red); }
   .log-line.info { color: var(--blue); }
-
   .divider { height: 1px; background: var(--border); margin: 0.75rem 0; }
 
-  @media (max-width: 500px) {
-    .row2, .editor-row { grid-template-columns: 1fr; }
-    .sheet-row { flex-direction: column; }
-  }
+  @media (max-width: 500px) { .row2, .editor-row { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 <div class="container">
-
   <header>
     <div>
-      <h1>Availability dashboard</h1>
+      <h1>Mesa · Availability</h1>
       <p>Update open seats after a no-show or cancellation</p>
     </div>
     <span class="sync-badge" id="sync-badge">not synced</span>
   </header>
 
-  <!-- Restaurant + Date -->
   <div class="card">
     <div class="card-label">Restaurant</div>
     <div class="rest-selector" id="rest-selector">
@@ -301,20 +125,23 @@
         <input type="date" id="date-picker" />
       </div>
       <div style="display:flex;align-items:flex-end;">
-        <p style="font-size:13px;color:var(--text3);padding-bottom:9px;">Tap a slot below to set availability</p>
+        <p style="font-size:13px;color:var(--text3);padding-bottom:9px;">Tap a slot to set or mark as filled</p>
       </div>
     </div>
   </div>
 
-  <!-- Time slots -->
   <div class="card">
     <div class="card-label">Time slots</div>
     <div class="legend">
       <span><span class="dot dot-idle"></span>Not set</span>
       <span><span class="dot dot-open"></span>Open</span>
-      <span><span class="dot dot-full"></span>Full</span>
+      <span><span class="dot dot-filled-mesa"></span>Mesa booking</span>
+      <span><span class="dot dot-filled-walkin"></span>Walk-in</span>
+      <span><span class="dot dot-filled-covermanager"></span>CoverManager</span>
     </div>
     <div class="time-grid" id="time-grid"></div>
+
+    <!-- Set availability editor -->
     <div class="editor" id="editor">
       <div class="editor-title" id="editor-title">Editing 20:00</div>
       <div class="editor-row">
@@ -337,28 +164,70 @@
     </div>
   </div>
 
-  <!-- Sync to Google Sheet -->
   <div class="card">
-    <div class="card-label">Sync to Google Sheets</div>
-    <div class="sheet-row">
-      <button class="btn-push" onclick="pushToSheet()" id="push-btn" style="width:100%;">Push update to sheet →</button>
+    <div class="card-label">Sync</div>
+    <div class="push-wrap">
+      <button class="btn-push" onclick="pushToSheet()" id="push-btn">Push update to sheet →</button>
+      <span class="poll-indicator" id="poll-indicator">polls every 30s</span>
     </div>
     <div class="log" id="log"><div class="log-line">— waiting for sync —</div></div>
   </div>
+</div>
 
+<!-- Fill modal -->
+<div class="fill-modal" id="fill-modal">
+  <div class="fill-modal-box">
+    <div class="fill-modal-title" id="fill-modal-title">Mark slot as filled</div>
+    <div class="fill-modal-sub" id="fill-modal-sub">How was this table filled?</div>
+    <div class="fill-options">
+      <button class="fill-opt" onclick="markFilled('filled-walkin')">
+        <span class="fill-dot" style="background:#5A2D8A;"></span>
+        <div><div class="fill-label">Walk-in</div><div class="fill-desc">Guest arrived without a reservation</div></div>
+      </button>
+      <button class="fill-opt" onclick="markFilled('filled-covermanager')">
+        <span class="fill-dot" style="background:#8A5E00;"></span>
+        <div><div class="fill-label">CoverManager</div><div class="fill-desc">Booked through CoverManager</div></div>
+      </button>
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:0.75rem;text-align:center;">Mesa bookings are updated automatically — no action needed.</p>
+    <button class="btn-fill-cancel" onclick="closeFillModal()">Cancel</button>
+  </div>
 </div>
 
 <script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby0IfdCwLNv45JNJN0YfP-ZSELbWVh1Urvz2uhxI47k9I8zILLF1uEpFlU_C6ucQJWD/exec';
+const SHEET_ID  = '14_CMMxrRwSOFf7euLjwkmjzxzHAbNZbDUK7aD3kfebM';
 const SLOTS = ['12:00','12:30','13:00','13:30','14:00','19:00','19:30','20:00','20:30','21:00','21:30','22:00'];
+
 let currentRest = 'La Parrilla';
 let selectedSlot = null;
+let fillTargetSlot = null;
 const state = {};
+let pollTimer = null;
 
 const today = new Date().toISOString().split('T')[0];
 document.getElementById('date-picker').value = today;
 document.getElementById('date-picker').addEventListener('change', () => { closeEditor(); renderGrid(); });
 
 function key(r, d, s) { return `${r}|${d}|${s}`; }
+
+function statusClass(d) {
+  if (!d || !d.status) return '';
+  if (d.status === 'open') return 'open';
+  if (d.status === 'filled-mesa') return 'filled-mesa';
+  if (d.status === 'filled-walkin') return 'filled-walkin';
+  if (d.status === 'filled-covermanager') return 'filled-covermanager';
+  return '';
+}
+
+function slotLabel(d) {
+  if (!d || !d.status) return 'tap to set';
+  if (d.status === 'open') return (d.seats || 0) + ' seats';
+  if (d.status === 'filled-mesa') return 'Mesa ✓';
+  if (d.status === 'filled-walkin') return 'walk-in';
+  if (d.status === 'filled-covermanager') return 'CoverMgr';
+  return d.status;
+}
 
 function renderGrid() {
   const date = document.getElementById('date-picker').value;
@@ -367,20 +236,31 @@ function renderGrid() {
   SLOTS.forEach(slot => {
     const k = key(currentRest, date, slot);
     const d = state[k] || {};
+    const sc = statusClass(d);
+    const isFilled = sc.startsWith('filled-');
     const el = document.createElement('div');
-    el.className = 'slot' + (d.status === 'open' ? ' open' : d.status === 'full' ? ' full' : '') + (selectedSlot === slot ? ' selected' : '');
-    el.innerHTML = `<span class="slot-time">${slot}</span><span class="slot-info">${d.status === 'open' ? d.seats + ' seats' : d.status === 'full' ? 'full' : 'tap to set'}</span>`;
-    el.onclick = () => openEditor(slot, el);
+    el.className = 'slot' + (sc ? ' ' + sc : '') + (selectedSlot === slot ? ' selected' : '');
+    el.innerHTML = `<span class="slot-time">${slot}</span><span class="slot-info">${slotLabel(d)}</span>`;
+    el.onclick = () => {
+      if (isFilled) return; // already filled, no action
+      if (sc === 'open') {
+        // open slot — show fill modal
+        openFillModal(slot);
+      } else {
+        // not set — open editor
+        openEditor(slot);
+      }
+    };
     grid.appendChild(el);
   });
 }
 
-function openEditor(slot, el) {
+function openEditor(slot) {
   selectedSlot = slot;
   const date = document.getElementById('date-picker').value;
   const k = key(currentRest, date, slot);
   const d = state[k] || { seats: 4, status: 'open' };
-  document.getElementById('editor-title').textContent = `Editing ${slot} — ${currentRest}`;
+  document.getElementById('editor-title').textContent = `Setting availability — ${slot}`;
   document.getElementById('seats-input').value = d.seats || 4;
   document.getElementById('status-select').value = d.status || 'open';
   document.getElementById('editor').classList.add('visible');
@@ -398,9 +278,7 @@ function saveSlot() {
   const date = document.getElementById('date-picker').value;
   const k = key(currentRest, date, selectedSlot);
   state[k] = {
-    restaurant: currentRest,
-    date,
-    slot: selectedSlot,
+    restaurant: currentRest, date, slot: selectedSlot,
     seats: parseInt(document.getElementById('seats-input').value) || 0,
     status: document.getElementById('status-select').value,
     updatedAt: new Date().toISOString()
@@ -410,19 +288,45 @@ function saveSlot() {
   addLog(`Saved: ${currentRest} · ${date} · ${selectedSlot}`, 'ok');
 }
 
+function openFillModal(slot) {
+  fillTargetSlot = slot;
+  const date = document.getElementById('date-picker').value;
+  document.getElementById('fill-modal-title').textContent = `${slot} — ${currentRest}`;
+  document.getElementById('fill-modal-sub').textContent = `${date} · How was this table filled?`;
+  document.getElementById('fill-modal').classList.add('visible');
+}
+
+function closeFillModal() {
+  document.getElementById('fill-modal').classList.remove('visible');
+  fillTargetSlot = null;
+}
+
+function markFilled(newStatus) {
+  if (!fillTargetSlot) return;
+  const date = document.getElementById('date-picker').value;
+  const k = key(currentRest, date, fillTargetSlot);
+  state[k] = { ...state[k], status: newStatus, updatedAt: new Date().toISOString() };
+  closeFillModal();
+  renderGrid();
+  setBadge('pending');
+  const label = newStatus === 'filled-mesa' ? 'Mesa booking' : newStatus === 'filled-walkin' ? 'walk-in' : 'CoverManager';
+  addLog(`Marked ${fillTargetSlot} as filled (${label}) — push to sync`, 'info');
+}
+
 function selectRest(btn, name) {
   document.querySelectorAll('.rest-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   currentRest = name;
   closeEditor();
+  closeFillModal();
   renderGrid();
 }
 
-function setBadge(state) {
+function setBadge(s) {
   const b = document.getElementById('sync-badge');
   b.className = 'sync-badge';
-  if (state === 'pending') { b.textContent = 'unsaved changes'; b.classList.add('pending'); }
-  else if (state === 'synced') { b.textContent = 'synced ✓'; b.classList.add('synced'); }
+  if (s === 'pending') { b.textContent = 'unsaved changes'; b.classList.add('pending'); }
+  else if (s === 'synced') { b.textContent = 'synced ✓'; b.classList.add('synced'); }
   else { b.textContent = 'not synced'; }
 }
 
@@ -436,31 +340,70 @@ function addLog(msg, cls) {
 }
 
 async function pushToSheet() {
-  const scriptUrl = 'https://script.google.com/macros/s/AKfycby0IfdCwLNv45JNJN0YfP-ZSELbWVh1Urvz2uhxI47k9I8zILLF1uEpFlU_C6ucQJWD/exec';
-  const sheetId = '14_CMMxrRwSOFf7euLjwkmjzxzHAbNZbDUK7aD3kfebM';
   const rows = Object.values(state);
-  if (rows.length === 0) { addLog('No slots saved yet — set some slots first', 'err'); return; }
-
+  if (rows.length === 0) { addLog('No slots saved yet', 'err'); return; }
   const btn = document.getElementById('push-btn');
-  btn.disabled = true;
-  btn.textContent = 'Pushing…';
+  btn.disabled = true; btn.textContent = 'Pushing…';
   addLog(`Pushing ${rows.length} row(s)…`, 'info');
-
   try {
-    const payload = encodeURIComponent(JSON.stringify({ sheetId, rows }));
-    const url = `${scriptUrl}?data=${payload}`;
-    await fetch(url, { method: 'GET', mode: 'no-cors' });
-    addLog(`Sent ${rows.length} row(s) — check your Google Sheet to confirm`, 'ok');
+    const payload = encodeURIComponent(JSON.stringify({ sheetId: SHEET_ID, rows, action: 'push' }));
+    await fetch(`${SCRIPT_URL}?data=${payload}`, { method: 'GET', mode: 'no-cors' });
+    addLog(`Sent ${rows.length} row(s) — check your sheet`, 'ok');
     setBadge('synced');
   } catch(e) {
-    addLog('Could not reach Apps Script — check the URL', 'err');
+    addLog('Could not reach Apps Script', 'err');
   }
+  btn.disabled = false; btn.textContent = 'Push update to sheet →';
+}
 
-  btn.disabled = false;
-  btn.textContent = 'Push update →';
+// Poll sheet every 30s and update local state
+async function pollSheet() {
+  const date = document.getElementById('date-picker').value;
+  const tabName = date.replace(/-/g, '');
+  try {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${tabName}?key=AIzaSyD-PLACEHOLDER`;
+    // Since we don't have an API key here, polling reads via the Apps Script doGet
+    const pollUrl = `${SCRIPT_URL}?action=read&date=${date}&restaurant=${encodeURIComponent(currentRest)}`;
+    const res = await fetch(pollUrl, { mode: 'no-cors' });
+    // no-cors means opaque response — can't read body
+    // So polling via public sheet URL instead:
+    const sheetUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${tabName}`;
+    const r2 = await fetch(sheetUrl);
+    if (r2.ok) {
+      const text = await r2.text();
+      const json = JSON.parse(text.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, ''));
+      const rows = json.table?.rows || [];
+      rows.forEach(row => {
+        const cells = row.c || [];
+        const restaurant = cells[0]?.v;
+        const rowDate    = cells[1]?.v;
+        const slot       = cells[2]?.v;
+        const seats      = cells[3]?.v;
+        const status     = cells[4]?.v;
+        if (restaurant && rowDate && slot && status) {
+          const k = key(restaurant, rowDate, slot);
+          // Only update if sheet has a newer/different status
+          if (!state[k] || state[k].status !== status) {
+            state[k] = { restaurant, date: rowDate, slot, seats, status, updatedAt: cells[5]?.v || '' };
+          }
+        }
+      });
+      renderGrid();
+      document.getElementById('poll-indicator').textContent = 'updated ' + new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
+    }
+  } catch(e) {
+    // silent fail on poll
+  }
+}
+
+// Start polling
+function startPolling() {
+  pollSheet();
+  pollTimer = setInterval(pollSheet, 30000);
 }
 
 renderGrid();
+startPolling();
 </script>
 </body>
 </html>
