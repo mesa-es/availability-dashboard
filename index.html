@@ -340,20 +340,8 @@
   <!-- Sync to Google Sheet -->
   <div class="card">
     <div class="card-label">Sync to Google Sheets</div>
-    <div style="margin-bottom:10px;">
-      <label class="field-label">Apps Script URL</label>
-      <div class="sheet-row">
-        <input type="text" id="script-url" placeholder="https://script.google.com/macros/s/.../exec" />
-      </div>
-    </div>
-    <div style="margin-bottom:12px;">
-      <label class="field-label">Google Sheet ID</label>
-      <div class="sheet-row">
-        <input type="text" id="script-url" placeholder="Paste Sheet ID from your sheet's URL" />
-        <button class="btn-push" onclick="pushToSheet()" id="push-btn">Push update →</button>
-      </div>
-      <div style="margin-top:10px;"><label class="field-label">Google Sheet ID</label><input type="text" id="sheet-id-real" placeholder="Sheet ID from docs.google.com/spreadsheets/d/THIS_ID/edit" /></div>
-      <p class="hint">Paste the full deployment URL from Apps Script → Deploy → Manage deployments</p>
+    <div class="sheet-row">
+      <button class="btn-push" onclick="pushToSheet()" id="push-btn" style="width:100%;">Push update to sheet →</button>
     </div>
     <div class="log" id="log"><div class="log-line">— waiting for sync —</div></div>
   </div>
@@ -448,10 +436,8 @@ function addLog(msg, cls) {
 }
 
 async function pushToSheet() {
-  const scriptUrl = document.getElementById('script-url').value.trim();
-  const sheetId = document.getElementById('sheet-id-real') ? document.getElementById('sheet-id-real').value.trim() : '';
-  if (!scriptUrl) { addLog('Paste your Apps Script URL first', 'err'); return; }
-  if (!sheetId) { addLog('Paste your Google Sheet ID first', 'err'); return; }
+  const scriptUrl = 'https://script.google.com/macros/s/AKfycby0IfdCwLNv45JNJN0YfP-ZSELbWVh1Urvz2uhxI47k9I8zILLF1uEpFlU_C6ucQJWD/exec';
+  const sheetId = '14_CMMxrRwSOFf7euLjwkmjzxzHAbNZbDUK7aD3kfebM';
   const rows = Object.values(state);
   if (rows.length === 0) { addLog('No slots saved yet — set some slots first', 'err'); return; }
 
