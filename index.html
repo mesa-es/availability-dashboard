@@ -449,7 +449,7 @@ function addLog(msg, cls) {
 
 async function pushToSheet() {
   const scriptUrl = document.getElementById('script-url').value.trim();
-  const sheetId = document.getElementById('script-url').value.trim();
+  const sheetId = document.getElementById('sheet-id-real') ? document.getElementById('sheet-id-real').value.trim() : '';
   if (!scriptUrl) { addLog('Paste your Apps Script URL first', 'err'); return; }
   if (!sheetId) { addLog('Paste your Google Sheet ID first', 'err'); return; }
   const rows = Object.values(state);
@@ -461,19 +461,13 @@ async function pushToSheet() {
   addLog(`Pushing ${rows.length} row(s)…`, 'info');
 
   try {
-    const res = await fetch(scriptUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sheetId, rows })
-    });
-    if (res.ok) {
-      addLog(`Synced ${rows.length} row(s) successfully`, 'ok');
-      setBadge('synced');
-    } else {
-      addLog(`Sheet returned error ${res.status}`, 'err');
-    }
+    const payload = encodeURIComponent(JSON.stringify({ sheetId, rows }));
+    const url = `${scriptUrl}?data=${payload}`;
+    await fetch(url, { method: 'GET', mode: 'no-cors' });
+    addLog(`Sent ${rows.length} row(s) — check your Google Sheet to confirm`, 'ok');
+    setBadge('synced');
   } catch(e) {
-    addLog('Could not reach Apps Script — check CORS or URL', 'err');
+    addLog('Could not reach Apps Script — check the URL', 'err');
   }
 
   btn.disabled = false;
